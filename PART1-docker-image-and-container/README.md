@@ -19,7 +19,7 @@
     - tomcat
     - MySql & Wordpress
     - 연습문제 : Jenkins
-- 결론
+- 정리
 
 
 ## 도커란?
