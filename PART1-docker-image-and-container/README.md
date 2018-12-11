@@ -2,16 +2,16 @@
 
 ## 목차
 
-
 - 도커란?
     - 도커 엔진
-    - 도커 플랫폼
 - 도커 아키텍처
     - 도커 데몬
     - 도커 클라이언트
     - 도커 레지스트리
-    - 도커 이미지
-    - 도커 컨테이너
+    - 도커 오브젝트
+        - 도커 이미지
+        - 도커 컨테이너
+        - 도커 네트워크
 - 도커 설치
 - 도커 허브 회원 가입
 - 도커 이미지와 컨테이너
@@ -22,16 +22,56 @@
     - 로깅
     - 네트워크
     - 리소스 제한
-- 결론
+- 정리
 
 
 ## 도커란?
+Docker는 응용 프로그램을 개발, 배포 및 실행하기 위한 개방형 플랫폼입니다.
+
+Docker는 응용 프로그램을 격리된 컨테이너 단위로 관리하여 인프라에 대한 의존성 걱정없이 실행하고 제거할 수 있습니다. 
+
+또한 기존에 쓰이던 가상화 방법인 가상 머신과는 달리 도커 컨테이너는 성능의 손실이 거의 없습니다. 
+
+정리하면, 깔끔하게 격리되어서 실행가능하지만 성능 손실이 거의 없기 때문에 도커만 설치되어 있다면 현재 주어진 컴퓨팅 자원 위에서 깔끔하고, 효율적인 운영이 가능해집니다. 
+
+### 도커 엔진
+우리가 흔히 말하는 도커는 일반적으로 도커 엔진을 의미합니다. 도커를 설치하고 실행하면 `dockerd`라는 데몬 프로그램이 서버로서 실행되며, REST API, CLI(`docker`)도구들이 클라이언트가 되어서 도커 데몬에게 작업을 지시합니다.
+
+![](https://docs.docker.com/engine/images/engine-components-flow.png)
 
 ## 도커 아키텍처
+좀더 자세히 도커 아키텍처에 대해서 알아보겠습니다. 
+
+<img src="https://docs.docker.com/engine/images/architecture.svg" width="600" img>
+
+### 도커 데몬
+Docker 데몬 (`dockerd`)은 Docker API 요청을 수신하고 이미지, 컨테이너, 네트워크 및 볼륨과 같은 Docker 객체를 관리합니다. 데몬은 Docker 서비스를 관리하기 위해 다른 데몬과 통신 할 수도 있습니다.
+
+### 도커 클라이언트
+Docker 클라이언트 (`docker`)는 많은 Docker 사용자가 Docker와 상호 작용하는 주요 방법입니다. 와 같은 명령을 사용 docker run하면 클라이언트가이 명령을 전송하여 dockerd수행합니다. 이 docker명령은 Docker API를 사용합니다. Docker 클라이언트는 둘 이상의 데몬과 통신 할 수 있습니다.
+
+### 도커 레지스트리
+Docker 레지스트리 는 Docker 이미지를 저장합니다. Docker Hub와 Docker Cloud는 누구나 사용할 수있는 공용 레지스트리이며 Docker는 기본적으로 Docker Hub에서 이미지를 찾도록 구성되어 있습니다. 자신의 개인 레지스트리를 실행할 수도 있습니다. DDC(Docker Datacenter)을 사용하는 경우 DTR(Docker Trusted Registry)이 포함됩니다.
+
+`docker pull` 또는 `docker run` 명령을 사용하면 구성된 레지스트리에서 필요한 이미지를 가져옵니다. `docker push` 명령을 사용하면 이미지가 구성된 레지스트리로 푸시됩니다.
+
+### 도커 오브젝트
+
+#### 도커 이미지
+도커 컨테이너를 만들기 위한(실행하기 위한) 읽기 전용 템플릿입니다. 
+
+#### 도커 컨테이너
+도커 컨테이너는 도커 이미지의 실행가능한 인스턴스 입니다.
+
+#### 도커 네트워크 
 
 ## 도커 설치
+- Windows : https://docs.docker.com/docker-for-windows/install/
+- Mac : https://docs.docker.com/docker-for-mac/install/
+- centOS : https://docs.docker.com/install/linux/docker-ce/centos/
 
 ## 도커 허브 회원가입
+- https://hub.docker.com/
 
 ## 도커 이미지와 컨테이너 실습
 이번에는 실제로 도커 이미지를 받아서 컨테이너로 실행하는 것을 실습합니다. 
@@ -175,7 +215,7 @@ wordpress
 
 이미지를 다운받고 실행이 됩니다. `--link` 옵션을 통해서 mysql 컨테이너와 연결이 되었습니다. `--link`옵션은 연결할 컨테이너 이름(wp-db)을 오른쪽에 두고 왼쪽에는 연결할 호스트 이름(mysql)을 입력하여 컨테이너간 연결합니다. 현재 `--link` 옵션은 [legacy feature](https://docs.docker.com/network/links/)로 곧 삭제될 수 있는 기능이라고 합니다. 
 
-추천하는 방식은 사용자가 bridge network를 만들고 거기에 연결시키는 것을 추천합니다. 
+추천하는 방식은 사용자가 bridge network를 만들고 만들어진 네트워크에 연결시키는 것입니다.
 
 ```
 docker network create wp-network
@@ -194,4 +234,114 @@ wordpress
 
 #### 상태가 있는 서비스
 
-## 결론
+WordPress 설정을 한 이후에 만약 MySql 컨테이너를 내리면(종료하면) 어떻게 될까요? 당연히 WordPress 서비스는 제대로 동작하지 않고 DB에 저장된 데이터들은 모두 삭제됩니다. 컨테이너의 시작과 종료같은 생명주기와 상관없이 DB의 데이터를 유지하고 싶다면 어떻게 해야할까요? 그 해답은 Volume입니다. 
+
+컨테이너에 볼륨을 공유하는 방법은 세가지가 있습니다. 
+- 호스트의 파일이나 디렉토리를 컨테이너와 공유
+- 볼륨 컨테이너를 통해서 호스트와 볼륨 컨테이너간에 공유하고, 볼륨 컨테이너와 다른 컨테이너간에 공유
+- 도커 볼륨을 이용한 공유
+
+이번에는 간단하게 호스트의 디렉토리와 볼륨을 공유해보겠습니다. 
+
+```
+docker network create wp-network
+
+docker run -d --name wp-db \
+--network wp-network \
+-e MYSQL_ROOT_PASSWORD=password1 \
+-e MYSQL_DATABASE=wp \
+-v `pwd`/wp_db:/var/lib/mysql \
+mysql:5.7
+
+docker run -d --name wp \
+--network wp-network \
+-e WORDPRESS_DB_PASSWORD=password1 \
+-e WORDPRESS_DB_HOST=wp-db \
+-p 8080:80 \
+wordpress
+```
+
+다시 한번 브라우저를 통해서 설정을 마칩니다. 이번에는 mysql 만 종료했다가 다시 실행해보겠습니다. 
+
+```
+docker rm -f wp-db
+
+docker run -d --name wp-db \
+--network wp-network \
+-e MYSQL_ROOT_PASSWORD=password1 \
+-e MYSQL_DATABASE=wp \
+-v `pwd`/wp_db:/var/lib/mysql \
+mysql:5.7
+```
+
+잘 동작하는 것을 확인했다면 볼륨이 잘 공유되고 있는 것입니다. 볼륨은 `-v` 옵션에 `{호스트 디렉토리 또는 파일}:{컨테이너 디렉토리 또는 파일}` 이렇게 설정해주면 됩니다. 만약 호스트 디렉토리가 없다면 자동으로 생성합니다. `wp-db` 컨테이너의 한번 확인해보겠습니다. 컨테이너를 실행했던 위치에서 `ls` 명령어를 통해서 볼륨에 어떤 파일들이 저장되어있나 확인해봅니다. 
+
+```
+$ ls wp_db
+auto.cnf         client-key.pem  ib_logfile1         private_key.pem  sys
+ca-key.pem       ib_buffer_pool  ibtmp1              public_key.pem   wordpress
+ca.pem           ibdata1         mysql               server-cert.pem  wp
+client-cert.pem  ib_logfile0     performance_schema  server-key.pem
+```
+
+이번에는 도커 볼륨을 생성해서 볼륨을 공유해보겠습니다. 
+
+```
+docker volume create wp-db-volume
+```
+
+아래 명령어를 통해서 생성된 볼륨을 확인합니다. 볼륨을 설정할 때 여러 종류의 스토리지 백앤드를 사용할 수 있습니다. 예컨데 아마존의 스토리지에 저장할 수도 있습니다. 그러나 여기서는 기본적으로 제공하는 드라이버인 local을 사용할 예정입니다.
+```
+docker volume ls
+```
+
+이제 도커 볼륨을 통해 컨테이너와 데이터를 공유하도록 해보겠습니다. 
+ 
+ ```
+docker run -d --name wp-db \
+--network wp-network \
+-e MYSQL_ROOT_PASSWORD=password1 \
+-e MYSQL_DATABASE=wp \
+-v wp-db-volume:/var/lib/mysql \
+mysql:5.7
+
+docker run -d --name wp \
+--network wp-network \
+-e WORDPRESS_DB_PASSWORD=password1 \
+-e WORDPRESS_DB_HOST=wp-db \
+-p 8080:80 \
+wordpress
+```
+
+DB를 종료했다가 다시 실행해도 잘 동작하는 것을 확인했다면 도커 볼륨으로 컨테이너와 볼륨 공유가 성공적으로 이루어졌다는 뜻입니다. 아래 명령어를 통해서 볼륨 정보를 출력해보겠습니다. 도커 볼륨도 결국엔 어떤 파일 혹은 디렉토리입니다. 실제 어디에 저장되어 있는지 확인할 수 있습니다.
+
+```
+$ docker inspect --type volume wp-db-volume
+[
+    {
+        "CreatedAt": "2018-12-11T17:30:14Z",
+        "Driver": "local",
+        "Labels": {},
+        "Mountpoint": "/var/lib/docker/volumes/wp-db-volume/_data",
+        "Name": "wp-db-volume",
+        "Options": {},
+        "Scope": "local"
+    }
+]
+
+$ sudo ls /var/lib/docker/volumes/wp-db-volume/_data
+auto.cnf         client-key.pem  ib_logfile1         private_key.pem  sys
+ca-key.pem       ib_buffer_pool  ibtmp1              public_key.pem   wordpress
+ca.pem           ibdata1         mysql               server-cert.pem  wp
+client-cert.pem  ib_logfile0     performance_schema  server-key.pem
+```
+
+도커 사용하지 않는 볼륨은 다음 명령어로 삭제 가능합니다.
+
+```
+docker volume prune
+```
+
+### 연습문제 : 도커를 이용하여 master-slave 구조의 jenkins 구축
+
+## 정리
