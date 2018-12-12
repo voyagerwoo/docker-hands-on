@@ -1,6 +1,5 @@
 # Docker Images & Containers
-## 기반 개발팀 우여명
----
+
 ## 목차
 
 - 도커란?
@@ -46,13 +45,13 @@ Docker는 응용 프로그램을 격리된 컨테이너 단위로 관리하여 �
 <img src="https://docs.docker.com/engine/images/architecture.svg" width="600">
 
 ### 도커 데몬
-Docker 데몬 (`dockerd`)은 Docker API 요청을 수신하고 이미지, 컨테이너, 네트워크 및 볼륨과 같은 Docker 객체를 관리합니다. 데몬은 Docker 서비스를 관리하기 위해 다른 데몬과 통신 할 수도 있습니다.
+도커 데몬 (`dockerd`)은 도커 API 요청을 수신하고 이미지, 컨테이너, 네트워크 및 볼륨과 같은 도커 객체를 관리합니다. 데몬은 도커 서비스를 관리하기 위해 다른 데몬과 통신 할 수도 있습니다.
 
 ### 도커 클라이언트
-Docker 클라이언트 (`docker`)는 많은 Docker 사용자가 Docker와 상호 작용하는 주요 방법입니다. 와 같은 명령을 사용 docker run하면 클라이언트가이 명령을 전송하여 dockerd수행합니다. 이 docker명령은 Docker API를 사용합니다. Docker 클라이언트는 둘 이상의 데몬과 통신 할 수 있습니다.
+도커 클라이언트 (`docker`)는 많은 도커 사용자가 Docker와 상호 작용하는 주요 방법입니다. 와 같은 명령을 사용 `docker run`하면 클라이언트가 이 명령을 전송하여 `dockerd`를 수행합니다. 이 `docker`명령은 도커 API를 사용합니다. 도커 클라이언트는 둘 이상의 데몬과 통신 할 수 있습니다.
 
 ### 도커 레지스트리
-Docker 레지스트리 는 Docker 이미지를 저장합니다. Docker Hub와 Docker Cloud는 누구나 사용할 수있는 공용 레지스트리이며 Docker는 기본적으로 Docker Hub에서 이미지를 찾도록 구성되어 있습니다. 자신의 개인 레지스트리를 실행할 수도 있습니다. DDC(Docker Datacenter)을 사용하는 경우 DTR(Docker Trusted Registry)이 포함됩니다.
+도커 레지스트리 는 도커 이미지를 저장합니다. 도커 허브는 누구나 사용할 수 있는 공용 레지스트리이며 도커는 기본적으로 도커 허브에서 이미지를 찾도록 구성되어 있습니다. 자신의 개인 레지스트리를 실행할 수도 있습니다. DDC(Docker Datacenter)을 사용하는 경우 DTR(Docker Trusted Registry)이 포함됩니다.
 
 `docker pull` 또는 `docker run` 명령을 사용하면 구성된 레지스트리에서 필요한 이미지를 가져옵니다. `docker push` 명령을 사용하면 이미지가 구성된 레지스트리로 푸시됩니다.
 
@@ -78,7 +77,7 @@ openjdk:8-alpine
 - IMAGE_TAG : 이미지의 버전 관리 혹은 Revision 관리에 사용됩니다. 생략하게 되면 latest 태그로 인식합니다.
 
 ##### 도커 레지스트리 vs 도커 레파지토리
-- 도커 레지스트리(Docker Registry) : 도커 이미지를 저장하는 서비스, 에를 들어 Docker hub, Quay, ECR 등 실제 이미지를 저장하고 관리하는 서비스.
+- 도커 레지스트리(Docker Registry) : 도커 이미지를 저장하는 서비스, 에를 들어 도커 허브, Quay, ECR 등 실제 이미지를 저장하고 관리하는 서비스.
 - 도커 레파지토리(Docker Repository) : 이름이 같지만 태그가 다른 도커 이미지의 논리적 모음
 
 
