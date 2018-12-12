@@ -234,12 +234,27 @@ mysql> show databases;
 ```
 docker run -d --name wp \
 -e WORDPRESS_DB_PASSWORD=password1 \
+-e WORDPRESS_DB_NAME=wp \
 --link wp-db:mysql \
 -p 8080:80 \
 wordpress
 ```
 
-이미지를 다운받고 실행이 됩니다. `--link` 옵션을 통해서 mysql 컨테이너와 연결이 되었습니다. `--link`옵션은 연결할 컨테이너 이름(wp-db)을 오른쪽에 두고 왼쪽에는 연결할 호스트 이름(mysql)을 입력하여 컨테이너간 연결합니다. 현재 `--link` 옵션은 [legacy feature](https://docs.docker.com/network/links/)로 곧 삭제될 수 있는 기능이라고 합니다. 
+이미지를 다운받고 실행이 됩니다. `--link` 옵션을 통해서 mysql 컨테이너와 연결이 되었습니다. `--link`옵션은 연결할 컨테이너 이름(wp-db)을 오른쪽에 두고 왼쪽에는 연결할 호스트 이름(mysql)을 입력하여 컨테이너간 연결합니다. 아래 명령어로 워드프레스 컨테이너에 들어가서 `hosts` 파일을 확인해 보면 다음과 같이 `172.17.0.2 mysql f00f5a500a84 wp-db` mysql 호스트가 설정된 것을 보실 수 있습니다.
+```
+$ docker exec -it wp bash
+root@e0b4dceb74be:~# cat /etc/hosts
+127.0.0.1       localhost
+::1     localhost ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+172.17.0.2      mysql f00f5a500a84 wp-db
+172.17.0.3      e0b4dceb74be
+```
+
+현재 `--link` 옵션은 [legacy feature](https://docs.docker.com/network/links/)로 곧 삭제될 수 있는 기능이라고 합니다. 
 
 추천하는 방식은 사용자가 bridge network를 만들고 만들어진 네트워크에 연결시키는 것입니다.
 
@@ -251,9 +266,61 @@ docker network connect wp-network wp-db
 docker run -d --name wp \
 -e WORDPRESS_DB_PASSWORD=password1 \
 -e WORDPRESS_DB_HOST=wp-db \
+-e WORDPRESS_DB_NAME=wp \
 --network wp-network \
 -p 8080:80 \
 wordpress
+```
+
+이렇게 하게 되면 `wp` 컨테이너 안에 들어가서 호스트 파일을 봐도 정보가 없습니다. 대신 아래 명령어를 통해서 새로 만든 브릿지 네트워크에 컨테이너들이 어떻게 설정되어 있는지 확인할 수 있습니다.
+
+```
+$ docker network inspect wp-network
+[
+    {
+        "Name": "wp-network",
+        "Id": "a8236461889218d9432f79bfa4f145331c565d15194f62b45a57e440f12d5e33",
+        "Created": "2018-12-12T07:56:51.7711884Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "172.19.0.0/16",
+                    "Gateway": "172.19.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "5866c3a757a25900866133380234574626b92ec4faf6c03f7f85ddec19fd6997": {
+                "Name": "wp",
+                "EndpointID": "4fdccfbdd36cc361991e7b12a5946c786ccbe2e9c3eadac2fbdfd313878ccbae",
+                "MacAddress": "02:42:ac:13:00:03",
+                "IPv4Address": "172.19.0.3/16",
+                "IPv6Address": ""
+            },
+            "f00f5a500a8430ee8fc8068a12487ba133c7fb5fafcdfd6c350cd4898492b2db": {
+                "Name": "wp-db",
+                "EndpointID": "a7448536555708ce470aad1415ba2ea28f63e6d498c0fed33e73d2914ed6d663",
+                "MacAddress": "02:42:ac:13:00:02",
+                "IPv4Address": "172.19.0.2/16",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {},
+        "Labels": {}
+    }
+]
 ```
 
 브라우저에 접속해서 WordPress 설정을 해봅니다. 그리고 다시 wp-db에 접속해서 테이블을 확인해보면 WordPress가 테이블을 만든것을 확인할 수 있습니다.
@@ -283,6 +350,7 @@ docker run -d --name wp \
 --network wp-network \
 -e WORDPRESS_DB_PASSWORD=password1 \
 -e WORDPRESS_DB_HOST=wp-db \
+-e WORDPRESS_DB_NAME=wp \
 -p 8080:80 \
 wordpress
 ```
@@ -335,6 +403,7 @@ docker run -d --name wp \
 --network wp-network \
 -e WORDPRESS_DB_PASSWORD=password1 \
 -e WORDPRESS_DB_HOST=wp-db \
+-e WORDPRESS_DB_NAME=wp \
 -p 8080:80 \
 wordpress
 ```
@@ -381,3 +450,9 @@ docker volume prune
 어떤 새로운 도구를 시험해보고자 할 때 굉장히 유용하게 사용할 수 있습니다. 예컨데 흔히 ELK라고 불리우는 Elastic Stack을 POC(Proof of concept) 할 때, 컴퓨터에 설치없이 이미지를 다운받아서 테스트 해볼 수 있습니다.
 
 다음 PART 2에서는 이미지를 직접 만들고 관리하는 내용에 대해서 살펴보겠습니다.
+
+
+## 참고 자료
+[시작하세요 도커 - 용찬호 저](https://book.naver.com/bookdb/book_detail.nhn?bid=11884948)
+[Docker docs - Docker Orientation](https://docs.docker.com/get-started/part1)
+[Docker docs - Docker Overview](https://docs.docker.com/engine/docker-overview/#the-docker-platform)
