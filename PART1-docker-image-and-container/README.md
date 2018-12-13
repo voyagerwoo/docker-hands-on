@@ -453,6 +453,6 @@ docker volume prune
 
 
 ## 참고 자료
-[시작하세요 도커 - 용찬호 저](https://book.naver.com/bookdb/book_detail.nhn?bid=11884948)
-[Docker docs - Docker Orientation](https://docs.docker.com/get-started/part1)
-[Docker docs - Docker Overview](https://docs.docker.com/engine/docker-overview/#the-docker-platform)
+- [시작하세요 도커 - 용찬호 저](https://book.naver.com/bookdb/book_detail.nhn?bid=11884948)
+- [Docker docs - Docker Orientation](https://docs.docker.com/get-started/part1)
+- [Docker docs - Docker Overview](https://docs.docker.com/engine/docker-overview/#the-docker-platform)
