@@ -1,0 +1,13 @@
+{
+  "name": "simple-express",
+  "version": "1.0.0",
+  "description": "Node.js on Docker",
+  "author": "voyagerwoo <voyager.woo@gmail.com>",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.16.1"
+  }
+}
