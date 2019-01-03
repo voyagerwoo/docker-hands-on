@@ -20,7 +20,7 @@ ubuntu 이미지에 apache2를 설치한 사용자 정의 이미지를 만들고
 
 우선 아래의 명령어를 통해서 ubuntu 이미지를 실행합니다.
 ```bash
-docker run -it --rm --name ubuntu_apache ubuntu:18:04 
+docker run -it --rm --name ubuntu_apache ubuntu:18.04 
 ```
 
 컨테이너에 들어오게 되면 아래 명령어로 apache2를 설치합니다.
