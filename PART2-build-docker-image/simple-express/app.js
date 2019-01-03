@@ -1,14 +1,12 @@
-'use strict';
-
 const express = require('express');
 
-// 상수
 const PORT = 8080;
 const HOST = '0.0.0.0';
 
-// 앱
 const app = express();
 app.get('/', (req, res) => {
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    console.log(`request from ${ip}`)
     res.send('Hello I-scream edu!\n');
 });
 

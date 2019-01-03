@@ -1,4 +1,4 @@
-FROM node:10
+FROM node:lts-alpine
 
 # 앱 디렉터리 생성
 WORKDIR /usr/src/app

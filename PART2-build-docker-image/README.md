@@ -7,8 +7,8 @@
     - `apache2`가 설치된 이미지
     - 빌드 컨텍스트와 `Dockerfile` 빌드 과정
     - Dockerize Express App
-    - Dockerize Spring App 
-- 도커허브에 이미지 배포
+    - 연습문제 : Dockerize Spring App
+- 도커 허브에 이미지 배포
 - 정리
 
 ## `docker commit` 명령어로 사용자 정의 이미지 만들기
@@ -339,11 +339,237 @@ Successfully tagged apache-ubuntu:latest ······⑧
 - ⑦ : 빌드가 성공적으로 완료되었다.
 - ⑧ : 태깅이 완료되었다.
 
-### Dockerize Express App
+### [Dockerize Express App](https://github.com/voyagerwoo/docker-hands-on/tree/master/PART2-build-docker-image/simple-express)
+이번에는 간단하게 nodejs로 server 앱을 도커 이미지로 만들어보겠습니다. 이렇게 어떤 소프트웨어를 도커이미지로 만드는 것을 `Dockerize`라고 합니다.
+nodejs와 express에 대한 자세한 내용은 다루지 않을 예정입니다.
 
-### Dockerize Spring App
+미리 `simple-express`라는 디렉토리를 만들어주세요. 지금부터 만드는 파일은 모두 이 디렉토리에 추가합니다.
+첫번째로 할 일은 `package.json`을 만드는 일입니다. 이 파일은 마치 메이븐 프로젝트의 `pom.xml` 처럼 의존성을 정의하고 실행관련 스크립트를 정의하는 파일입니다.
 
-## 도커허브에 이미지 배포
+```json
+{
+  "name": "simple-express",
+  "version": "1.0.0",
+  "description": "Node.js on Docker",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.16.1"
+  }
+}
+```
+
+그 다음에 `app.js` 파일을 통해서 간단한 웹 서버 앱을 만들어보겠습니다.
+```js
+const express = require('express');
+
+const PORT = 8080;
+const HOST = '0.0.0.0';
+    
+const app = express();
+app.get('/', (req, res) => {
+    res.send('Hello I-scream edu!\n');
+});
+
+app.listen(PORT, HOST);
+console.log(`Running on http://${HOST}:${PORT}`);
+``` 
+요청하면 "Hello I-scream edu!"를 응답하는 앱입니다.
+
+로컬 개발환경에서 실행해보려면 nodejs와 NPM이 필요합니다. 
+`npm install`이라는 명령어를 통해서 의존관계에 있는 모듈을 설치하고, `npm run start` 또는 `node app.js` 명령어를 통해서 서버를 실행합니다.
+
+```
+npm install
+npm run start
+```
+
+도커를 이용해서 만약 nodejs와 NPM이 없어도 실행가능합니다. 그럼 `Dockerfile`을 만들어보겠습니다.
+
+```
+FROM node:lts-alpine
+
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm install
+COPY . .
+
+EXPOSE 8080
+CMD [ "npm", "start" ]
+```
+
+살짝 느낌이 오시겠지만 이런 서버 앱을 도커 이미지로 만드는 절차는 대부분 비슷해서 코드도 생각보다 간단한 편입니다.
+
+우분투 이미지에 nodejs를 설치하고 이미지를 만들어도 되겠지만, `node:lts-alpine`이라는 도커 허브에서 공식적으로 제공하는 도커 이미지가 있기 때문입니다.
+당연하게도 수많은 언어와 플랫폼을 이미 도커 이미지로 만들어두었습니다. 그런 이미지를 사용해 쉽게 우리만의 도커 이미지를 만들 수 있습니다.
+
+
+
+`COPY`라는 명령어는 `ADD`라는 명령어와 거의 비슷하게 컨텍스트의 파일을 도커 이미지로 옮길 때 사용하는 명령어입니다. 
+`COPY`는 현재 컨텍스트에 있는 로컬 파일이나 디렉토리만 이미지에 복사할 수 있습니다.
+`ADD`는 현재 컨텍스트에 있는 파일 이외에도 URL을 통해서도 파일을 복사할 수 있습니다. 또한 `tar` 파일을 옮기면서 압축을 풀 수 있습니다.
+
+여기까지 하면 준비가 완료되었습니다. `simple-express` 디렉토리에서 빌드해보겠습니다.
+
+```bash
+docker build -t simple-express:alpine .
+```
+```
+Sending build context to Docker daemon  1.918MB
+Step 1/7 : FROM node:lts-alpine
+ ---> 0d5ae56139bd
+Step 2/7 : WORKDIR /usr/src/app
+ ---> Using cache
+ ---> 57550f498d1c
+Step 3/7 : COPY package*.json ./
+ ---> 3d403781ee1e
+Step 4/7 : RUN npm install
+ ---> Running in c520a01118d1
+npm notice created a lockfile as package-lock.json. You should commit this file.
+npm WARN simple-express@1.0.0 No repository field.
+npm WARN simple-express@1.0.0 No license field.
+
+added 48 packages from 36 contributors and audited 121 packages in 2.946s
+found 0 vulnerabilities
+
+Removing intermediate container c520a01118d1
+ ---> 6534471f867b
+Step 5/7 : COPY . .
+ ---> 6b1598d310ec
+Step 6/7 : EXPOSE 8080
+ ---> Running in f97bec70897f
+Removing intermediate container f97bec70897f
+ ---> 2854960cb048
+Step 7/7 : CMD [ "npm", "start" ]
+ ---> Running in e734bfbc1ddc
+Removing intermediate container e734bfbc1ddc
+ ---> 997b170aa998
+Successfully built 997b170aa998
+Successfully tagged simple-express:alpine
+```
+
+빌드가 성공하면 컨테이너로 실행해보겠습니다. 
+```bash
+docker run -it --rm -p 8080:8080 simple-express:alpine
+```
+
+브라우저에서 http://localhost:8080 에 접속하면 동작을 확인할 수 있습니다.
+
+기본적으로 nodejs의 패키지 매니저인 npm은 의존성 있는 모듈을 `node_modules`라는 디렉토리에 내려받습니다.
+만약 로컬 환경에서 테스트를 했다면 확인할 수 있습니다.
+
+<img src="./images/node_modules.png" width="300">
+
+도커 이미지 빌드시에 `node_modules`는 필요가 없습니다. 왜냐하면 이미지를 빌드하면서 컨테이너 내부에 다운받기 때문입니다.
+그리고 `package-lock.json`, `npm-debug.log`라는 파일도 npm 설치시에 자동으로 생성되는 파일이기 때문에 빌드와는 상관이 없습니다. 
+이 디렉토리와 파일들을 `.dockerignore`라는 파일을 만들고 추가해 보겠습니다.
+
+```
+node_modules
+npm-debug.log
+package-lock.json
+```
+
+다시 빌드해볼까요?
+
+```bash
+docker build -t simple-express .
+```
+```
+Sending build context to Docker daemon   5.12kB
+...생략
+```
+
+빌드 컨텍스트의 크기가 1.918MB에서 5.12KB로 줄어들었네요! 이런식으로 빌드 속도를 줄일 수 있습니다!
+
+#### [alpinelinux](https://alpinelinux.org/)
+수많은 [nodejs 이미지](https://hub.docker.com/_/node/?tab=tags)가 있습니다. 
+이번 실습에서는 그 중에서 `lts-alpine`이라는 태그를 가진 이미지를 사용했습니다. 
+지난 시간에 설명하였듯이 태그를 통해서 버전 정보 및 기타 이미지에 대한 정보를 기술합니다. 
+`lts`는 우리가 익히 알고 있는 Long Term Support의 약자입니다. 안정적인 버전이라는 뜻이지요.
+
+그럼 뒤에 `alpine`은 무엇을 의미할까요? 바로 이미지를 초 경량 리눅스 배포판인 `alpinelinux` 기반으로 만들었다는 뜻입니다.
+얼마나 작은지 확인해볼까요.
+
+```
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+simple-express      node10              2c87ee2855a4        4 seconds ago       900MB
+simple-express      alpine              40f695091f9b        9 minutes ago       73.7MB
+node                10                  0d5ae56139bd        5 days ago          897MB
+node                lts-alpine          288d2f688643        7 days ago          70.7MB
+```
+우선 일반적은 `node:10` 이미지의 경우 900M에 육박합니다. 그러나 `node:lts-alpine`의 경우에는 70M 밖에 되지 않습니다. 
+무려 10배 이상의 차이입니다. 그럼 컨테이너에 한번 들어가 볼까요?
+
+`simple-express` 이미지로 실행되는 모든 컨테이너를 종료하고 새로 컨테이너를 시작해보겠습니다.
+`alpinelinux`에는 `bash`는 없고 `ash`가 있습니다.
+```
+docker run -d --rm -p 8080:8080 --name simple-express-alpine simple-express:alpine
+docker exec -it simple-express-alpine ash
+```
+```
+/usr/src/app # ls
+Dockerfile         node_modules       package.json
+app.js             package-lock.json
+```
+컨테이너에 파일들이 잘 들어있네요. 여기저기 돌아다니면서 이것 저것 확인해보세요.
+
+처음에는 여러 도구들이 익숙한 ubuntu 같은 도커 이미지 위에서 우리만의 도커 이미지를 만들어 보고 훈련이 되었다면 alpine 리눅스를 써보는 것을 추천합니다.
+
+
+
+###  연습문제 - Dockerize Spring App
+참고 : https://github.com/voyagerwoo/petclinic-rest
+
+## [도커 허브](https://hub.docker.com/)에 이미지 배포
+
+도커 허브는 깃 허브와 개념적으로 비슷한 부분이 조금 있습니다. 
+리포지토리를 만들어서 푸시할 수 있다는 점과 웹 UI에서 리포지토리를 확인할 수 있다는 점이 그렇습니다.
+우리는 이번에 각자의 계정에 도커 이미지를 저장할 리포지토리를 만들고 금방전에 만들었던 이미지를 푸시해보겠습니다.
+
+
+우선 도커 허브에 회원가입을 합니다. 그리고 그 계정으로 terminal에서 `docker login`을 실행하여 로그인합니다.
+
+아까 만든 `simple-express` 이미지를 `docker tag`라는 명령어를 통해서 이름을 바꿔줘야합니다. 
+
+```bash
+docker tag simple-express:alpine ${dockerhub_username}/simple-express:alpine
+docker tag simple-express:alpine voyagerwoo/simple-express:alpine
+```
+```
+REPOSITORY                  TAG                 IMAGE ID            CREATED             SIZE
+simple-express              alpine              40f695091f9b        32 minutes ago      73.7MB
+voyagerwoo/simple-express   alpine              40f695091f9b        32 minutes ago      73.7MB
+```
+
+PART1 에 잠깐 이야기했듯이 도커 이미지 이름에는 많은 의미가 있습니다. 이름 자체가 리파지토리 주소이기 때문입니다.
+```
+{REPOSITORY_NAME}/{IMAGE_NAME}:{IMAGE_TAG}
+voyagerwoo/simple-express:alpine
+```
+도커 허브의 리파지토리 이름은 도커 허브 사용자이름 입니다. 태깅한 이름 그대로 푸시하면 됩니다.
+
+```bash
+docker push voyagerwoo/simple-express:alpine
+```
+
+로그인이 잘 되었고 네트워크 문제만 없다면 도커 허브에 이미지가 푸시됩니다. 
+이제는 네트워크만 연결되어 있다면 어디서든 내가 만든 이미지를 다운로드(`docker pull`)할 수 있습니다.
+
+<img src="./images/dockerhub.png" width="700">
+
+## 정리
+실습을 통해서 사용자 정의 도커 이미지를 만들었습니다. 
+`Dockerfile`의 명령어들을 간단히 살펴보고 빌드 과정에 대해서 알 수 있었습니다. 
+그리고 만들어진건 이미지를 테스트해보고 도커 허브에 푸시했습니다. 
+
+많은 요구사항에 대응해서 도커 이미지를 만들려면 오늘 배운 내용 말고도 많은 명령어들을 알아야합니다.
+[도커 공식 문서](https://docs.docker.com/engine/reference/builder)에서 자세히 공부해 보는 것을 추천합니다.
+
+PART3에서는 `docker-compose`에 대해서 알아보겠습니다. 
+컨테이너들의 관계를 정의하고 실행할 수 있는 기능을 가진 명령어 입니다.
 
 
 ## 참고자료 
@@ -353,3 +579,5 @@ https://nodejs.org/ko/docs/guides/nodejs-docker-webapp/
 https://docs.docker.com/v17.09/engine/userguide/eng-image/dockerfile_best-practices
 https://stackoverflow.com/questions/22111060/what-is-the-difference-between-expose-and-publish-in-docker
 https://stackoverflow.com/questions/25775266/how-to-keep-docker-container-running-after-starting-services
+https://nickjanetakis.com/blog/docker-tip-2-the-difference-between-copy-and-add-in-a-dockerile
+https://www.lesstif.com/pages/viewpage.action?pageId=35356819
