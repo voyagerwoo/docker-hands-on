@@ -341,7 +341,7 @@ Successfully tagged apache-ubuntu:latest ······⑧
 
 ### [Dockerize Express App](https://github.com/voyagerwoo/docker-hands-on/tree/master/PART2-build-docker-image/simple-express)
 이번에는 간단하게 nodejs로 server 앱을 도커 이미지로 만들어보겠습니다. 이렇게 어떤 소프트웨어를 도커이미지로 만드는 것을 `Dockerize`라고 합니다.
-nodejs와 express에 대한 자세한 내용은 다루지 않을 예정입니다.
+여기에서 nodejs와 express에 대한 자세한 내용은 다루지 않습니다.
 
 미리 `simple-express`라는 디렉토리를 만들어주세요. 지금부터 만드는 파일은 모두 이 디렉토리에 추가합니다.
 첫번째로 할 일은 `package.json`을 만드는 일입니다. 이 파일은 마치 메이븐 프로젝트의 `pom.xml` 처럼 의존성을 정의하고 실행관련 스크립트를 정의하는 파일입니다.
