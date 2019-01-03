@@ -274,7 +274,7 @@ Successfully tagged apache-ubuntu:1
 
 이제 이 이미지를 컨테이너로 실행해 보겠습니다. 
 ```bash
-docker run -it --rm -p 8080:80 apache-ubuntu
+docker run -it --rm -p 8080:80 apache-ubuntu:1
 ```
 아래 두 링크를 통해서 잘 동작하는지 확인해 봅시다.
 - http://localhost:8080/
@@ -573,11 +573,11 @@ PART3에서는 `docker-compose`에 대해서 알아보겠습니다.
 
 
 ## 참고자료 
-https://medium.com/@jessgreb01/digging-into-docker-layers-c22f948ed612
-https://rampart81.github.io/post/docker_image/
-https://nodejs.org/ko/docs/guides/nodejs-docker-webapp/
-https://docs.docker.com/v17.09/engine/userguide/eng-image/dockerfile_best-practices
-https://stackoverflow.com/questions/22111060/what-is-the-difference-between-expose-and-publish-in-docker
-https://stackoverflow.com/questions/25775266/how-to-keep-docker-container-running-after-starting-services
-https://nickjanetakis.com/blog/docker-tip-2-the-difference-between-copy-and-add-in-a-dockerile
-https://www.lesstif.com/pages/viewpage.action?pageId=35356819
+- https://medium.com/@jessgreb01/digging-into-docker-layers-c22f948ed612
+- https://rampart81.github.io/post/docker_image/
+- https://nodejs.org/ko/docs/guides/nodejs-docker-webapp/
+- https://docs.docker.com/v17.09/engine/userguide/eng-image/dockerfile_best-practices
+- https://stackoverflow.com/questions/22111060/what-is-the-difference-between-expose-and-publish-in-docker
+- https://stackoverflow.com/questions/25775266/how-to-keep-docker-container-running-after-starting-services
+- https://nickjanetakis.com/blog/docker-tip-2-the-difference-between-copy-and-add-in-a-dockerile
+- https://www.lesstif.com/pages/viewpage.action?pageId=35356819
