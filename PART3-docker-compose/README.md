@@ -1,8 +1,8 @@
 # Docker Compose
 
 ## 목차
-- 여러 컨테이너로 구성된 Elastic 스택 실행하기
-- docker-compose를 이용해서 Elastic 스택 실행하기
+- 여러 컨테이너로 구성된 EFK 스택 실행하기
+- docker-compose를 이용해서 EFK 스택 실행하기
 - 도커 브릿지 네트워크
 - 도커 볼륨
 - docker-compose를 이용하여 통합 테스트 환경 구축하기
@@ -10,7 +10,7 @@
     - 단일 호스트 배포
     - docker-compose를 이용하여 개발환경 구축하기
 
-## 여러 컨테이너로 구성된 Elastic 스택 실행하기
+## 여러 컨테이너로 구성된 EFK 스택 실행하기
 
 ### 네트워크 만들기
 ```
@@ -102,7 +102,7 @@ docker run -d --rm --name hello-world --net es-net -p 8080:8080 \
     voyagerwoo/hello-world:v1
 ```
 
-## docker-compose를 이용해서 Elastic 스택 실행하기
+## docker-compose를 이용해서 EFK 스택 실행하기
 
 ## 참고 자료 
 - https://blog.jonnung.dev/system/2018/04/06/fluentd-log-collector-part1
