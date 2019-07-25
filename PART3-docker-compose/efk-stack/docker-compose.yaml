@@ -1,0 +1,48 @@
+version: '3'
+services:
+  elasticsearch:
+    image: elasticsearch:7.2.0
+    environment:
+      discovery.type: single-node
+    networks:
+      - es-net
+    ports:
+      - "9200:9200" 
+      - "9300:9300"
+  kibana:
+    image: kibana:7.2.0
+    networks:
+      - es-net
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
+  fluentd:
+    image: voyagerwoo/fluentd-es:v1.6-1
+    networks:
+      - es-net
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    volumes:
+      - ./fluentd/etc:/fluentd/etc
+    depends_on:
+      - elasticsearch
+  hello-world:
+    image: voyagerwoo/hello-world:v1
+    networks:
+      - es-net
+    ports:
+      - 8080:8080
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: "hello.{.ID}}"
+    depends_on:
+      - fluentd
+
+networks:
+  es-net:
+    driver: bridge
+    
